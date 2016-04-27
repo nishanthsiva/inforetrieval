@@ -54,15 +54,10 @@ public class WordIndex {
         final String METHOD_NAME = "createTermSet";
         LOGGER.entering(CLASS_NAME, METHOD_NAME);
 
-        LOGGER.log(Level.INFO,filenames.length+" files read!");
-        int i=0;
+        LOGGER.log(Level.FINE,filenames.length+" files read!");
         for(String file: this.filenames){
-            i++;
-            if(i==1000){
-                break;
-            }//TODO Remove the check above which breaks the loop
-            Map<String,Integer> termFreqMap = FileUtil.getFileTerms(this.folder+"/"+file);
-            LOGGER.log(Level.INFO,i+" ");
+            Map<String,Integer> termFreqMap = FileUtil.getFileTerms(this.folder+File.separator+file);
+            LOGGER.log(Level.FINE,i+" ");
 
             Iterator<String> fileTermIterator = termFreqMap.keySet().iterator();
             while(fileTermIterator.hasNext()){
@@ -102,17 +97,14 @@ public class WordIndex {
         final String METHOD_NAME = "printPostingList";
         LOGGER.entering(CLASS_NAME,METHOD_NAME);
 
-        List<PostingTuple> postingList = new ArrayList<>();
-        Map<String,Integer> docOccuranceMap = this.postingsMap.get(term);
-        if(docOccuranceMap != null){
-            for(String docName : docOccuranceMap.keySet()){
-                System.out.println("[Document name = "+docName+", Term Occurance = "+docOccuranceMap.get(docName)+"]");
-            }
+        System.out.printf("PostingList for "+term);
+        List<PostingTuple> postingTupleList = postingList(term);
+        if(postingTupleList.size() > 0){
+            for(PostingTuple postingTuple: postingTupleList)
+                System.out.println("[Document name = "+postingTuple.getDocumentName()+", Term Occurance = "+postingTuple.getTermOccurance()+"]");
         }else{
             System.out.println("Term not found!");
         }
-
-
         LOGGER.exiting(CLASS_NAME,METHOD_NAME);
 
     }

@@ -34,6 +34,50 @@ public class FileUtil {
         return fileNames;
     }
 
+    public static Map<String,Integer> getBiWordsFromFile(String filepath){
+        final String METHOD_NAME = "getBiWordFromFile";
+        LOGGER.entering(CLASS_NAME,METHOD_NAME);
+
+        Map<String,Integer> biWordFreqMap = new HashMap<>();
+        List<String> termList = new ArrayList<>();
+        FileReader fileReader;
+        try {
+            fileReader = new FileReader(new File(filepath));
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while(bufferedReader.ready()){
+                String line = bufferedReader.readLine();
+                String[] tokens = line.split(" ");
+                for(String token: tokens){
+                    String[] processedWords = StringUtil.processWord(token);
+                    for(String term: processedWords){
+                        if(term.length() >= 3 && !term.toLowerCase().equals("the")){
+                            termList.add(term.toLowerCase());
+                        }
+                    }
+                }
+            }
+            for(int i=0;i<termList.size()-1;i++){
+                String term_1 = termList.get(i);
+                String term_2 = termList.get(i+1);
+                String biWord = term_1+","+term_2;
+                if(biWordFreqMap.containsKey(biWord)){
+                    biWordFreqMap.put(biWord,biWordFreqMap.get(biWord)+1);
+                }else{
+                    biWordFreqMap.put(biWord,1);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            LOGGER.warning(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.warning(e.getMessage());
+        }
+
+        LOGGER.exiting(CLASS_NAME, METHOD_NAME);
+        return biWordFreqMap;
+    }
+
     public static Map<String,Integer> getFileTerms(String filepath){
         final String METHOD_NAME = "getFileTerms";
         LOGGER.entering(CLASS_NAME,METHOD_NAME);
