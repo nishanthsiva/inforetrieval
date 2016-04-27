@@ -57,7 +57,6 @@ public class WordIndex {
         LOGGER.log(Level.FINE,filenames.length+" files read!");
         for(String file: this.filenames){
             Map<String,Integer> termFreqMap = FileUtil.getFileTerms(this.folder+File.separator+file);
-            LOGGER.log(Level.FINE,i+" ");
 
             Iterator<String> fileTermIterator = termFreqMap.keySet().iterator();
             while(fileTermIterator.hasNext()){
