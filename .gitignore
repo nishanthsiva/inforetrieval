@@ -1,2 +1,5 @@
 *.iml
 .idea/
+pa4/
+out/
+.DS_Store
