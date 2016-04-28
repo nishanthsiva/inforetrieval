@@ -43,7 +43,6 @@ public class WordIndex {
         for(int i=0;i<filepaths.length;i++){
             File file = new File(filepaths[i]);
             filenames[i] = file.getName();
-            LOGGER.log(Level.FINE, filenames[i]);
         }
 
         LOGGER.exiting(CLASS_NAME, METHOD_NAME);
@@ -60,7 +59,6 @@ public class WordIndex {
 
         LOGGER.log(Level.FINE,filenames.length+" files read!");
         for(String file: this.filenames){
-            LOGGER.log(Level.FINE,"Reading file "+file);
             Map<String,Integer> termFreqMap = FileUtil.getFileTerms(this.folder+File.separator+file);
             this.termDocumentMap.put(file,termFreqMap.keySet());
             Iterator<String> fileTermIterator = termFreqMap.keySet().iterator();
@@ -75,7 +73,6 @@ public class WordIndex {
                 }
 
             }
-            LOGGER.log(Level.FINE,this.postingsMap+"");
         }
         LOGGER.exiting(CLASS_NAME, METHOD_NAME);
     }

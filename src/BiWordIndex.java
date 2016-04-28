@@ -31,8 +31,6 @@ public class BiWordIndex {
     }
 
     private String[] getAllFileNames(){
-        final String METHOD_NAME = "getAllFileNames";
-        LOGGER.entering(CLASS_NAME, METHOD_NAME);
 
         String[] filepaths = FileUtil.getFiles(folder).toArray(new String[1]);
         String[] filenames = new String[filepaths.length];
@@ -42,17 +40,15 @@ public class BiWordIndex {
             LOGGER.log(Level.FINE, filenames[i]);
         }
 
-        LOGGER.exiting(CLASS_NAME, METHOD_NAME);
         return filenames;
     }
 
     public Set<String> getDocumentBiWords(String documentName){
         return this.biWordDocumentMap.get(documentName);
     }
-    
+
     private void createTermSet(){
         final String METHOD_NAME = "createTermSet";
-        LOGGER.entering(CLASS_NAME, METHOD_NAME);
 
         LOGGER.log(Level.INFO,filenames.length+" files read!");
         for(String file: this.filenames){
@@ -71,7 +67,6 @@ public class BiWordIndex {
                 }
 
             }
-            LOGGER.log(Level.FINE,this.postingsMap+"");
         }
         LOGGER.log(Level.INFO,"Finished REading ");
         LOGGER.exiting(CLASS_NAME, METHOD_NAME);

@@ -14,7 +14,6 @@ public class FileUtil {
     public static List<String> getFiles(String directoryPath){
         final String METHOD_NAME = "getFiles";
 
-        LOGGER.entering(CLASS_NAME, METHOD_NAME);
         List<String> fileNames = new ArrayList<>();
 
         File dirNode = new File(directoryPath);
@@ -29,14 +28,11 @@ public class FileUtil {
         }else{
             fileNames.add(dirNode.getAbsolutePath());
         }
-        LOGGER.exiting(CLASS_NAME, METHOD_NAME);
 
         return fileNames;
     }
 
     public static List<String> getBiWordsFromFile(String filepath){
-        final String METHOD_NAME = "getBiWordFromFile";
-        LOGGER.entering(CLASS_NAME,METHOD_NAME);
 
         List<String> biWordSet = new ArrayList<>();
         List<String> termList = new ArrayList<>();
@@ -67,13 +63,10 @@ public class FileUtil {
             LOGGER.warning(e.getMessage());
         }
 
-        LOGGER.exiting(CLASS_NAME, METHOD_NAME);
         return biWordSet;
     }
 
     public static Map<String,Integer> getFileTerms(String filepath){
-        final String METHOD_NAME = "getFileTerms";
-        LOGGER.entering(CLASS_NAME,METHOD_NAME);
 
         Map<String,Integer> termFreqMap = new HashMap<>();
         FileReader fileReader;
@@ -102,7 +95,6 @@ public class FileUtil {
             LOGGER.warning(e.getMessage());
         }
 
-        LOGGER.exiting(CLASS_NAME, METHOD_NAME);
         return termFreqMap;
     }
 
