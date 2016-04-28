@@ -101,5 +101,26 @@ public class FileUtil {
 		    }
 		}
 	}
+
+    public static Set<String> getBiWords(String line){
+
+        Set<String> biWordSet = new TreeSet<>();
+        String[] tokens = StringUtil.processWord(line);
+        String [] new_tokens = new String[tokens.length];
+        List<String> tokenList = new ArrayList<>();
+        for(int i=0;i<tokens.length;i++){
+            if(tokens[i].length() > 2){
+                tokenList.add(tokens[i]);
+            }
+        }
+        for(int i=0;i<tokenList.size()-1;i++){
+            biWordSet.add(tokenList.get(i)+","+tokenList.get(i+1));
+        }
+        return biWordSet;
+    }
+
+    public static void main(String args[]){
+        System.out.println(getBiWords("My name is Nihanth Sivakumar. I am a student here"));
+    }
     
 }
