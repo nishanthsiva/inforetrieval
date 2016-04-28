@@ -12,7 +12,7 @@ public class BiWordIndex {
 
     private final String[] filenames;
     private String folder;
-    private Map<String, Map<String,Integer>> postingsMap ;
+    private Map<String, Set<String>> postingsMap ;
 
     public BiWordIndex(String folderName){
         this.folder = folderName;
@@ -48,24 +48,23 @@ public class BiWordIndex {
         final String METHOD_NAME = "createTermSet";
         LOGGER.entering(CLASS_NAME, METHOD_NAME);
 
-        LOGGER.log(Level.FINE,filenames.length+" files read!");
+        LOGGER.log(Level.INFO,filenames.length+" files read!");
         for(String file: this.filenames){
-            Map<String,Integer> termFreqMap = FileUtil.getBiWordsFromFile(this.folder+File.separator+file);
-
-            Iterator<String> fileTermIterator = termFreqMap.keySet().iterator();
-            while(fileTermIterator.hasNext()){
-                String term = fileTermIterator.next();
+            List<String> biWordList = FileUtil.getBiWordsFromFile(this.folder+File.separator+file);
+            for(int i=0;i<biWordList.size();i++){
+                String term = biWordList.get(i);
                 if(this.postingsMap.containsKey(term)){
-                    this.postingsMap.get(term).put(file,termFreqMap.get(term));
+                    this.postingsMap.get(term).add(file);
                 }else{
-                    HashMap<String,Integer> docOccuranceMap = new HashMap<>();
-                    docOccuranceMap.put(file,termFreqMap.get(term));
-                    this.postingsMap.put(term,docOccuranceMap);
+                    Set<String> postingList = new TreeSet<>();
+                    postingList.add(file);
+                    this.postingsMap.put(term,postingList);
                 }
 
             }
             LOGGER.log(Level.FINE,this.postingsMap+"");
         }
+        LOGGER.log(Level.INFO,"Finished REading ");
         LOGGER.exiting(CLASS_NAME, METHOD_NAME);
     }
 
@@ -74,13 +73,7 @@ public class BiWordIndex {
         LOGGER.entering(CLASS_NAME,METHOD_NAME);
 
         List<String> postingList = new ArrayList<>();
-        Map<String,Integer> docOccuranceMap = this.postingsMap.get(term);
-        if(docOccuranceMap != null) {
-            for (String docName : docOccuranceMap.keySet()) {
-                postingList.add(docName);
-            }
-        }
-
+        postingList.addAll(this.postingsMap.get(term));
         LOGGER.exiting(CLASS_NAME,METHOD_NAME);
         return postingList;
     }

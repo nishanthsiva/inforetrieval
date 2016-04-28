@@ -34,19 +34,19 @@ public class FileUtil {
         return fileNames;
     }
 
-    public static Map<String,Integer> getBiWordsFromFile(String filepath){
+    public static List<String> getBiWordsFromFile(String filepath){
         final String METHOD_NAME = "getBiWordFromFile";
         LOGGER.entering(CLASS_NAME,METHOD_NAME);
 
-        Map<String,Integer> biWordFreqMap = new HashMap<>();
+        List<String> biWordSet = new ArrayList<>();
         List<String> termList = new ArrayList<>();
         FileReader fileReader;
         try {
             fileReader = new FileReader(new File(filepath));
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while(bufferedReader.ready()) {
-                String line = bufferedReader.readLine();
-                String[] tokens = StringUtil.removePuncutation(line).split(" ");
+            String line = null;
+            while((line = bufferedReader.readLine()) != null) {
+                String[] tokens = line.replaceAll(":|;|\\.|,|'","").split(" ");
                 for (String term : tokens) {
                     term = term.toLowerCase();
                     if (term.length() >= 3 && !term.equals("the")) {
@@ -57,12 +57,7 @@ public class FileUtil {
             for(int i=0;i<termList.size()-1;i++){
                 String term_1 = termList.get(i);
                 String term_2 = termList.get(i+1);
-                String biWord = term_1+","+term_2;
-                if(biWordFreqMap.containsKey(biWord)){
-                    biWordFreqMap.put(biWord,biWordFreqMap.get(biWord)+1);
-                }else{
-                    biWordFreqMap.put(biWord,1);
-                }
+                biWordSet.add(term_1+","+term_2);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -73,7 +68,7 @@ public class FileUtil {
         }
 
         LOGGER.exiting(CLASS_NAME, METHOD_NAME);
-        return biWordFreqMap;
+        return biWordSet;
     }
 
     public static Map<String,Integer> getFileTerms(String filepath){
