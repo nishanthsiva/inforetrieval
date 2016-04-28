@@ -13,11 +13,13 @@ public class BiWordIndex {
     private final String[] filenames;
     private String folder;
     private Map<String, Set<String>> postingsMap ;
+    private Map<String, Set<String>> biWordDocumentMap;
 
     public BiWordIndex(String folderName){
         this.folder = folderName;
         this.filenames = getAllFileNames();
         this.postingsMap  = new HashMap<>();
+        this.biWordDocumentMap = new HashMap<>();
 
     }
 
@@ -44,6 +46,10 @@ public class BiWordIndex {
         return filenames;
     }
 
+    public Set<String> getDocumentBiWords(String documentName){
+        return this.biWordDocumentMap.get(documentName);
+    }
+    
     private void createTermSet(){
         final String METHOD_NAME = "createTermSet";
         LOGGER.entering(CLASS_NAME, METHOD_NAME);
@@ -51,6 +57,9 @@ public class BiWordIndex {
         LOGGER.log(Level.INFO,filenames.length+" files read!");
         for(String file: this.filenames){
             List<String> biWordList = FileUtil.getBiWordsFromFile(this.folder+File.separator+file);
+            Set<String> biWordSet = new TreeSet<>();
+            biWordSet.addAll(biWordList);
+            this.biWordDocumentMap.put(file,biWordSet);
             for(int i=0;i<biWordList.size();i++){
                 String term = biWordList.get(i);
                 if(this.postingsMap.containsKey(term)){
