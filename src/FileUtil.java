@@ -75,17 +75,7 @@ public class FileUtil {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while(bufferedReader.ready()){
                 String line = bufferedReader.readLine();
-                String[] tokens = StringUtil.removePuncutation(line).split(" ");
-                for(String term: tokens){
-                    term = term.toLowerCase();
-                    if(term.length() >= 3 && !term.equals("the")){
-                        if(termFreqMap.containsKey(term)){
-                            termFreqMap.put(term,termFreqMap.get(term)+1);
-                        }else{
-                            termFreqMap.put(term,1);
-                        }
-                    }
-                }
+                writeTermOccurenceToMap(termFreqMap, line);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -98,5 +88,18 @@ public class FileUtil {
         return termFreqMap;
     }
 
-
+	public static void writeTermOccurenceToMap(Map<String, Integer> termFreqMap, String line) {
+		String[] tokens = StringUtil.removePuncutation(line).split(" ");
+		for(String term: tokens){
+		    term = term.toLowerCase();
+		    if(term.length() >= 3 && !term.equals("the")){
+		        if(termFreqMap.containsKey(term)){
+		            termFreqMap.put(term,termFreqMap.get(term)+1);
+		        }else{
+		            termFreqMap.put(term,1);
+		        }
+		    }
+		}
+	}
+    
 }

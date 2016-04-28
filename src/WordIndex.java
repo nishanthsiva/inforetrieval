@@ -34,7 +34,7 @@ public class WordIndex {
         LOGGER.exiting(CLASS_NAME,METHOD_NAME);
     }
 
-    private String[] getAllFileNames(){
+    public String[] getAllFileNames(){
         final String METHOD_NAME = "getAllFileNames";
         LOGGER.entering(CLASS_NAME, METHOD_NAME);
 
