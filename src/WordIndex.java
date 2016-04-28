@@ -50,6 +50,10 @@ public class WordIndex {
         return filenames;
     }
 
+    public Set<String> getDocumentTerms(String documentName){
+        return this.termDocumentMap.get(documentName);
+    }
+
     private void createTermSet(){
         final String METHOD_NAME = "createTermSet";
         LOGGER.entering(CLASS_NAME, METHOD_NAME);
@@ -58,7 +62,7 @@ public class WordIndex {
         for(String file: this.filenames){
             LOGGER.log(Level.FINE,"Reading file "+file);
             Map<String,Integer> termFreqMap = FileUtil.getFileTerms(this.folder+File.separator+file);
-
+            this.termDocumentMap.put(file,termFreqMap.keySet());
             Iterator<String> fileTermIterator = termFreqMap.keySet().iterator();
             while(fileTermIterator.hasNext()){
                 String term = fileTermIterator.next();
