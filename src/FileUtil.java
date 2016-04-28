@@ -44,15 +44,13 @@ public class FileUtil {
         try {
             fileReader = new FileReader(new File(filepath));
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while(bufferedReader.ready()){
+            while(bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
-                String[] tokens = line.split(" ");
-                for(String token: tokens){
-                    String[] processedWords = StringUtil.processWord(token);
-                    for(String term: processedWords){
-                        if(term.length() >= 3 && !term.toLowerCase().equals("the")){
-                            termList.add(term.toLowerCase());
-                        }
+                String[] tokens = StringUtil.removePuncutation(line).split(" ");
+                for (String term : tokens) {
+                    term = term.toLowerCase();
+                    if (term.length() >= 3 && !term.equals("the")) {
+                        termList.add(term);
                     }
                 }
             }
@@ -89,16 +87,14 @@ public class FileUtil {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while(bufferedReader.ready()){
                 String line = bufferedReader.readLine();
-                String[] tokens = line.split(" ");
-                for(String token: tokens){
-                    String[] processedWords = StringUtil.processWord(token);
-                    for(String term: processedWords){
-                        if(term.length() >= 3 && !term.toLowerCase().equals("the")){
-                            if(termFreqMap.containsKey(term.toLowerCase())){
-                                termFreqMap.put(term.toLowerCase(),termFreqMap.get(term.toLowerCase())+1);
-                            }else{
-                                termFreqMap.put(term.toLowerCase(),1);
-                            }
+                String[] tokens = StringUtil.removePuncutation(line).split(" ");
+                for(String term: tokens){
+                    term = term.toLowerCase();
+                    if(term.length() >= 3 && !term.equals("the")){
+                        if(termFreqMap.containsKey(term)){
+                            termFreqMap.put(term,termFreqMap.get(term)+1);
+                        }else{
+                            termFreqMap.put(term,1);
                         }
                     }
                 }

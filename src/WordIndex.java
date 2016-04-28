@@ -56,6 +56,7 @@ public class WordIndex {
 
         LOGGER.log(Level.FINE,filenames.length+" files read!");
         for(String file: this.filenames){
+            LOGGER.log(Level.FINE,"Reading file "+file);
             Map<String,Integer> termFreqMap = FileUtil.getFileTerms(this.folder+File.separator+file);
 
             Iterator<String> fileTermIterator = termFreqMap.keySet().iterator();
@@ -100,7 +101,7 @@ public class WordIndex {
         List<PostingTuple> postingTupleList = postingList(term);
         if(postingTupleList.size() > 0){
             for(PostingTuple postingTuple: postingTupleList)
-                System.out.println("[Document name = "+postingTuple.getDocumentName()+", Term Occurance = "+postingTuple.getTermOccurance()+"]");
+                System.out.println("[Document name = "+postingTuple.getDocumentName()+", Term Occurrance = "+postingTuple.getTermOccurance()+"]");
         }else{
             System.out.println("Term not found!");
         }
@@ -124,7 +125,7 @@ public class WordIndex {
     public static void main(String arg[]){
         WordIndex index = new WordIndex("pa4");
         index.buildIndex();
-        index.printPostingList("baseball");
+        index.printPostingList("ticket");
     }
 
 }
