@@ -77,7 +77,9 @@ public class BiWordIndex {
         LOGGER.entering(CLASS_NAME,METHOD_NAME);
 
         List<String> postingList = new ArrayList<>();
-        postingList.addAll(this.postingsMap.get(term));
+        if(this.postingsMap.containsKey(term)){
+            postingList.addAll(this.postingsMap.get(term));
+        }
         LOGGER.exiting(CLASS_NAME,METHOD_NAME);
         return postingList;
     }
@@ -101,6 +103,6 @@ public class BiWordIndex {
     public static void main(String arg[]){
         BiWordIndex index = new BiWordIndex("pa4");
         index.buildIndex();
-        index.printPostingList("ticket sales");
+        index.printPostingList("reverse sales");
     }
 }
