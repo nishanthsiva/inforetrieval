@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,16 +26,21 @@ public class QueryProcessor {
         log2 = Math.log(2);
 	}
 	
-	public void queryDocuments() throws IOException{
+	public void queryDocuments() {
 		String query = null;
 		Integer k = null;
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		Integer numDocs = wordIndex.getAllFileNames().length;
 		while(true) {
+			try {
 	        System.out.print("Enter query : ");
 			query = br.readLine();
 	        System.out.print("Enter number of top documents to find :");
 	        k = Integer.parseInt(br.readLine());
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
 	        Map<String,Integer> queryTermOccurenceMap = new HashMap<>();
 	        Map<String,Double> weightedDocumentTermMap = new HashMap<>();
 	        FileUtil.writeTermOccurenceToMap(queryTermOccurenceMap, query);
@@ -64,14 +70,14 @@ public class QueryProcessor {
 	        	Document document = documentsContainingTerms.get(documentName);
 	        	document.similarity = (document.similarity) / (sizeOfQueryVector + wordIndex.getDocumentTerms(documentName).size());
 	        }
-	        List<Document> documentsWithTerms = (List<Document>) documentsContainingTerms.values();
+	        List<Document> documentsWithTerms = new ArrayList<Document>(documentsContainingTerms.values());
 	        Collections.sort(documentsWithTerms);
 	        documentsContainingTerms = new HashMap<String,Document>();
-	        int endIndex = (2*k > numDocs) ? numDocs : 2*k;
+	        int endIndex = (2*k > numDocs) ? documentsWithTerms.size() : 2*k;
 	        for (Document doc : documentsWithTerms.subList(0, endIndex)) {
 	        	documentsContainingTerms.put(doc.fileName, doc);
 	        }
-	        List<String> biWordsFromQuery = FileUtil.getBiWordsFromFile("");
+	        Set<String> biWordsFromQuery = FileUtil.getBiWords(query);
 	        for (String biWord : biWordsFromQuery) {
 	        	List<String> documentTuples = biWordIndex.postingList(biWord);
 	        	for (String documentTuple : documentTuples) {
@@ -81,21 +87,21 @@ public class QueryProcessor {
 	        		}
 	        	}
 	        }
-	        documentsWithTerms = (List<Document>) documentsContainingTerms.values();
+	        documentsWithTerms = new ArrayList<Document>(documentsContainingTerms.values());
 	        Collections.sort(documentsWithTerms, new Comparator<Document>() {
 
 				@Override
 				public int compare(Document o1, Document o2) {
 					if(o1.rank > o2.rank) {
-						return 1;
-					} else if (o1.rank < o2.rank) {
 						return -1;
+					} else if (o1.rank < o2.rank) {
+						return 1;
 					} else {
 						return o1.compareSimilarities(o2);
 					}
 				}
 			});
-	        endIndex = (k > numDocs) ? numDocs : k;
+	        endIndex = (k > numDocs) ? documentsWithTerms.size() : k;
 	        for(Document doc : documentsWithTerms.subList(0, endIndex)) {
 	        	System.out.println(doc.fileName + " - " + doc.similarity);
 	        }
@@ -126,9 +132,9 @@ public class QueryProcessor {
 			if (this.similarity == o2.similarity) {
 				return 0;
 			} else if (this.similarity > o2.similarity) {
-				return 1;
-			} else {
 				return -1;
+			} else {
+				return 1;
 			}
 		}
 
@@ -142,5 +148,10 @@ public class QueryProcessor {
 	
 	private double log2(Integer a) {
 		return Math.log(a)/log2;
+	}
+	
+	public static void main(String[] args) {
+		QueryProcessor queryProcessor = new QueryProcessor("C://Users//Sriram//Desktop//Study//pa4");
+		queryProcessor.queryDocuments();
 	}
 }
