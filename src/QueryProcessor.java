@@ -43,12 +43,17 @@ public class QueryProcessor {
 			}
 	        Map<String,Integer> queryTermOccurenceMap = new HashMap<>();
 	        Map<String,Double> weightedDocumentTermMap = new HashMap<>();
+	        Map<String,Double> weightedQueryTermMap = new HashMap<>();
+	        Map<String,Double> logNbyDFTMap = new HashMap<>();
 	        FileUtil.writeTermOccurenceToMap(queryTermOccurenceMap, query);
 	        Map<String,Document> documentsContainingTerms = new HashMap<String,Document>();
 	        Set<String> terms = queryTermOccurenceMap.keySet();
 	        for(String term : terms) {
 	        	List<PostingTuple> documentTuples = wordIndex.postingList(term);
 	        	Double logNbyDFT = Math.log10(numDocs/documentTuples.size());
+	        	logNbyDFTMap.put(term, logNbyDFT);
+	        	double weightOfTermInQuery = log2(1 + queryTermOccurenceMap.get(term));
+	        	weightedQueryTermMap.put(term, weightOfTermInQuery);
 	        	for(PostingTuple documentTuple : documentTuples) {
 	        		String docName = documentTuple.getDocumentName();
 	        		weightedDocumentTermMap.put(docName, (double) 0);
@@ -59,16 +64,22 @@ public class QueryProcessor {
 	        			doc = new Document(docName, documentTuple.getTermOccurance());
 	        		}
 	        		double weightOfTermInDocument = log2(1 + doc.termOccurence) * logNbyDFT;
-	        		double weightOfTermInQuery = log2(1 + queryTermOccurenceMap.get(term));
-	        		doc.similarity += (weightOfTermInDocument + weightOfTermInQuery);
+	        		
+	        		doc.similarity += (weightOfTermInDocument * weightOfTermInQuery);
 	        		documentsContainingTerms.put(docName,doc);
 	        	}
 	        }
-	        Integer sizeOfQueryVector = queryTermOccurenceMap.keySet().size();
+	        Double lengthOfQueryVector = (double) 0;
+	        for(String term : weightedQueryTermMap.keySet()) {
+	        	Double weight = weightedQueryTermMap.get(term);
+	        	lengthOfQueryVector += weight*weight;
+	        }
+	        lengthOfQueryVector = Math.sqrt(lengthOfQueryVector);
 	        for(String documentName : documentsContainingTerms.keySet()) {
 	        	// calculate cosine similarity with query vector
 	        	Document document = documentsContainingTerms.get(documentName);
-	        	document.similarity = (document.similarity) / (sizeOfQueryVector + wordIndex.getDocumentTerms(documentName).size());
+	        	Double lengthOfDocumentVector = findLengthOfDocumentVector(documentName,numDocs);
+	        	document.similarity = (document.similarity) / (lengthOfQueryVector * lengthOfDocumentVector);
 	        }
 	        List<Document> documentsWithTerms = new ArrayList<Document>(documentsContainingTerms.values());
 	        Collections.sort(documentsWithTerms);
@@ -108,8 +119,24 @@ public class QueryProcessor {
 		}
 	}
 	
+	private Double findLengthOfDocumentVector(String documentName, Integer numDocs) {
+		Double lengthSquared = (double) 0;
+		for(String term : wordIndex.getDocumentTerms(documentName)) {
+			Double weight = (double) 0;
+			List<PostingTuple> documentTuples = wordIndex.postingList(term);
+			for (PostingTuple tuple : documentTuples) {
+				if (tuple.getDocumentName().equals(documentName)){
+					weight = log2(1 + tuple.getTermOccurance()) * Math.log10(numDocs/documentTuples.size());;
+					break;
+				}
+			}
+			lengthSquared += weight * weight;
+		}
+		return Math.sqrt(lengthSquared);
+	}
+
 	class Document implements Comparable<Document>{
-		float similarity = 0.0f;
+		double similarity = 0.0f;
 		String fileName;
 		Integer termOccurence;
 		Integer rank = 0;
@@ -151,7 +178,7 @@ public class QueryProcessor {
 	}
 	
 	public static void main(String[] args) {
-		QueryProcessor queryProcessor = new QueryProcessor("C://Users//Sriram//Desktop//Study//pa4");
+		QueryProcessor queryProcessor = new QueryProcessor("pa4");
 		queryProcessor.queryDocuments();
 	}
 }
