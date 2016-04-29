@@ -1,15 +1,12 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.util.Collections;
-
+import java.util.Comparator;
 import java.util.HashMap;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * Created by Nishanth Sivakumar and Sriram Balasubramanian on 4/27/16.
@@ -39,13 +36,11 @@ public class QueryProcessor {
 	        System.out.print("Enter number of top documents to find :");
 	        k = Integer.parseInt(br.readLine());
 	        Map<String,Integer> queryTermOccurenceMap = new HashMap<>();
-	       // Map<String,Double> weightedQueryTermMap = new HashMap<>();
 	        Map<String,Double> weightedDocumentTermMap = new HashMap<>();
 	        FileUtil.writeTermOccurenceToMap(queryTermOccurenceMap, query);
 	        Map<String,Document> documentsContainingTerms = new HashMap<String,Document>();
 	        Set<String> terms = queryTermOccurenceMap.keySet();
 	        for(String term : terms) {
-	        	//weightedQueryTermMap.put(term, log2(1 + queryTermOccurenceMap.get(term)));
 	        	List<PostingTuple> documentTuples = wordIndex.postingList(term);
 	        	Double logNbyDFT = Math.log10(numDocs/documentTuples.size());
 	        	for(PostingTuple documentTuple : documentTuples) {
@@ -71,8 +66,39 @@ public class QueryProcessor {
 	        }
 	        List<Document> documentsWithTerms = (List<Document>) documentsContainingTerms.values();
 	        Collections.sort(documentsWithTerms);
-	        List<Document> Top2kDocuments = documentsWithTerms.subList(0, 2*k);
+	        documentsContainingTerms = new HashMap<String,Document>();
+	        int endIndex = (2*k > numDocs) ? numDocs : 2*k;
+	        for (Document doc : documentsWithTerms.subList(0, endIndex)) {
+	        	documentsContainingTerms.put(doc.fileName, doc);
+	        }
 	        List<String> biWordsFromQuery = FileUtil.getBiWordsFromFile("");
+	        for (String biWord : biWordsFromQuery) {
+	        	List<String> documentTuples = biWordIndex.postingList(biWord);
+	        	for (String documentTuple : documentTuples) {
+	        		if (documentsContainingTerms.containsKey(documentTuple)) {
+	        			Document doc = documentsContainingTerms.get(documentTuple);
+	        			doc.rank++;
+	        		}
+	        	}
+	        }
+	        documentsWithTerms = (List<Document>) documentsContainingTerms.values();
+	        Collections.sort(documentsWithTerms, new Comparator<Document>() {
+
+				@Override
+				public int compare(Document o1, Document o2) {
+					if(o1.rank > o2.rank) {
+						return 1;
+					} else if (o1.rank < o2.rank) {
+						return -1;
+					} else {
+						return o1.compareSimilarities(o2);
+					}
+				}
+			});
+	        endIndex = (k > numDocs) ? numDocs : k;
+	        for(Document doc : documentsWithTerms.subList(0, endIndex)) {
+	        	System.out.println(doc.fileName + " - " + doc.similarity);
+	        }
 		}
 	}
 	
@@ -80,9 +106,14 @@ public class QueryProcessor {
 		float similarity = 0.0f;
 		String fileName;
 		Integer termOccurence;
+		Integer rank = 0;
+		
+		Document(String fileName) {
+			this.fileName = fileName;
+		}
 		
 		Document(String fileName, Integer termOccurence){
-			this.fileName = fileName;
+			this(fileName);
 			this.termOccurence = termOccurence;
 		}
 
@@ -90,9 +121,8 @@ public class QueryProcessor {
 		public boolean equals(Object obj) {
 			return ((Document)obj).fileName.equals(this.fileName);
 		}
-
-		@Override
-		public int compareTo(Document o2) {
+		
+		private int compareSimilarities(Document o2) {
 			if (this.similarity == o2.similarity) {
 				return 0;
 			} else if (this.similarity > o2.similarity) {
@@ -100,6 +130,11 @@ public class QueryProcessor {
 			} else {
 				return -1;
 			}
+		}
+
+		@Override
+		public int compareTo(Document o2) {
+			return compareSimilarities(o2);
 		}
 		
 		
