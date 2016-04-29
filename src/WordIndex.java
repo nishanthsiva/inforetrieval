@@ -98,7 +98,7 @@ public class WordIndex {
         final String METHOD_NAME = "printPostingList";
         LOGGER.entering(CLASS_NAME,METHOD_NAME);
 
-        System.out.printf("PostingList for "+term);
+        System.out.println("PostingList for "+term);
         List<PostingTuple> postingTupleList = postingList(term);
         if(postingTupleList.size() > 0){
             for(PostingTuple postingTuple: postingTupleList)
@@ -126,7 +126,7 @@ public class WordIndex {
     public static void main(String arg[]){
         WordIndex index = new WordIndex("pa4");
         index.buildIndex();
-        index.printPostingList("ticket");
+        index.printPostingList("sales");
     }
 
 }

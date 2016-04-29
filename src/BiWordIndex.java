@@ -50,7 +50,7 @@ public class BiWordIndex {
     private void createTermSet(){
         final String METHOD_NAME = "createTermSet";
 
-        LOGGER.log(Level.INFO,filenames.length+" files read!");
+        LOGGER.log(Level.FINE,filenames.length+" files read!");
         for(String file: this.filenames){
             List<String> biWordList = FileUtil.getBiWordsFromFile(this.folder+File.separator+file);
             Set<String> biWordSet = new TreeSet<>();
@@ -68,7 +68,7 @@ public class BiWordIndex {
 
             }
         }
-        LOGGER.log(Level.INFO,"Finished REading ");
+        LOGGER.log(Level.FINE,"Finished REading ");
         LOGGER.exiting(CLASS_NAME, METHOD_NAME);
     }
 
